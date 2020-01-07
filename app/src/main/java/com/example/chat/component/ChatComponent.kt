@@ -6,6 +6,5 @@ import dagger.Component
 
 @Component(modules=[ChatModule::class])
 interface ChatComponent {
-
     fun inject(activity: MainActivity)
 }

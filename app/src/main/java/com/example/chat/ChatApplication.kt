@@ -4,10 +4,10 @@ import com.example.chat.component.ChatComponent
 
 class ChatApplication {
 
-    fun getComponent() : ChatComponent? {
+    fun getComponent()  {
 
 
-        return null
+
 
     }
 }
