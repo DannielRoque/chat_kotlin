@@ -7,12 +7,12 @@ import com.example.chat.R
 import com.example.chat.adapter.MensagemAdapter
 import com.example.chat.callback.EnviarMensagemCallback
 import com.example.chat.callback.OuvirMensagensCallback
+import com.example.chat.component.ChatComponent
 import com.example.chat.model.Mensagem
 import com.example.chat.service.ChatService
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Inject
 
 const val URLBASE = "http://172.19.248.134:8080/"
 //177.129.4.51
@@ -21,19 +21,19 @@ class MainActivity : AppCompatActivity() {
 
     private var id = 1
     private var mensagens = ArrayList<Mensagem>()
-    private lateinit var chatService : ChatService
+
+    @Inject
+    lateinit var chatService: ChatService
+
+    private lateinit var component : ChatComponent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         lv_mensagens.adapter = MensagemAdapter(mensagens, this, id)
 
-        val retrofit : Retrofit = Retrofit.Builder()
-            .baseUrl(URLBASE)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
 
-        chatService = retrofit.create(ChatService::class.java)
+        component.inject(this)
 
         ouvirMensagem()
 
@@ -53,8 +53,8 @@ class MainActivity : AppCompatActivity() {
         ouvirMensagem()
     }
 
-    fun ouvirMensagem(){
-        val call : Call<Mensagem> = chatService.ouvirMensagem()
+    fun ouvirMensagem() {
+        val call: Call<Mensagem> = chatService.ouvirMensagem()
         call.enqueue(OuvirMensagensCallback(this))
     }
 }
