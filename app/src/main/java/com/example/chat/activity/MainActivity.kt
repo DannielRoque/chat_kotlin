@@ -5,18 +5,23 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.chat.R
 import com.example.chat.adapter.MensagemAdapter
+import com.example.chat.callback.EnviarMensagemCallback
+import com.example.chat.callback.OuvirMensagensCallback
 import com.example.chat.model.Mensagem
 import com.example.chat.service.ChatService
-import com.example.chat.service.URLBASE
 import kotlinx.android.synthetic.main.activity_main.*
+import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+
+const val URLBASE = "http://172.19.248.134:8080/"
+//177.129.4.51
 
 class MainActivity : AppCompatActivity() {
 
     private var id = 1
     private var mensagens = ArrayList<Mensagem>()
-    lateinit var chatService : ChatService
+    private lateinit var chatService : ChatService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,10 +35,12 @@ class MainActivity : AppCompatActivity() {
 
         chatService = retrofit.create(ChatService::class.java)
 
-        chatService.ouvirMensagem()
+        ouvirMensagem()
 
         btn_enviar.setOnClickListener {
-            chatService.enviar(Mensagem(et_texto.text.toString(), id))
+            chatService.enviar(Mensagem(et_texto.text.toString(), id)).enqueue(
+                EnviarMensagemCallback()
+            )
         }
     }
 
@@ -43,6 +50,11 @@ class MainActivity : AppCompatActivity() {
         val adapter = MensagemAdapter(mensagens, this, id)
         lv_mensagens.adapter = adapter
 
-        chatService.ouvirMensagem()
+        ouvirMensagem()
+    }
+
+    fun ouvirMensagem(){
+        val call : Call<Mensagem> = chatService.ouvirMensagem()
+        call.enqueue(OuvirMensagensCallback(this))
     }
 }
